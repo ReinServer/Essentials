@@ -168,8 +168,15 @@ public class EssentialsEntityListener implements Listener {
             user.sendTl("infoAfterDeath", loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
         }
         if (user.isAuthorized("essentials.back.ondeath") && !ess.getSettings().isCommandDisabled("back")) {
-            user.setLastLocation();
-            user.sendTl("backAfterDeath");
+            final EntityDamageEvent damage = entity.getLastDamageCause();
+            if (!(damage instanceof EntityDamageByEntityEvent)
+                    || !( ((EntityDamageByEntityEvent) damage).getDamager() instanceof Player
+                    || ( ((EntityDamageByEntityEvent) damage).getDamager() instanceof Projectile
+                        && ((Projectile) ((EntityDamageByEntityEvent) damage).getDamager()).getShooter() instanceof Player))
+                    || user.isAuthorized("essentials.back.onpvpdeath")) {
+                        user.setLastLocation();
+                        user.sendTl("backAfterDeath");
+                    }
         }
         if (!ess.getSettings().areDeathMessagesEnabled()) {
             event.setDeathMessage("");
